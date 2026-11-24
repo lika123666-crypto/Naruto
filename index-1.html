@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0a0a0a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>T4FX GOLD | XAUUSD Trading Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --card: #141414;
+      --card2: #1c1c1c;
+      --border: #2a2a2a;
+      --gold: #d4a017;
+      --gold-light: #f0c14b;
+      --green: #00c853;
+      --red: #ff1744;
+      --text: #f5f5f5;
+      --text2: #999;
+      --blue: #2979ff;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      min-height: 100vh;
+      padding-bottom: 78px;
+    }
+
+    /* Header */
+    .header {
+      background: #0f0f0f;
+      border-bottom: 1px solid var(--border);
+      padding: 12px 16px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-icon {
+      width: 34px;
+      height: 34px;
+      background: linear-gradient(135deg, var(--gold), #b8860b);
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 13px;
+      color: #000;
+    }
+
+    .logo-text {
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: -0.4px;
+    }
+
+    .logo-text span { color: var(--gold); }
+
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--text2);
+      background: var(--card);
+      padding: 5px 10px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      background: var(--green);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.35; }
+    }
+
+    /* Top Tabs */
+    .tabs {
+      display: flex;
+      overflow-x: auto;
+      gap: 6px;
+      padding: 10px 12px;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      scrollbar-width: none;
+    }
+    .tabs::-webkit-scrollbar { display: none; }
+
+    .tab {
+      flex-shrink: 0;
+      padding: 7px 14px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text2);
+      font-size: 12.5px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .tab.active {
+      background: var(--gold);
+      color: #000;
+      border-color: var(--gold);
+      font-weight: 700;
+    }
+
+    /* Sections */
+    .section {
+      display: none;
+      padding: 14px;
+      animation: fadeIn 0.25s ease;
+    }
+    .section.active { display: block; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .section-title {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-title::before {
+      content: '';
+      width: 3.5px;
+      height: 15px;
+      background: var(--gold);
+      border-radius: 2px;
+    }
+
+    /* Chart */
+    .chart-box {
+      background: var(--card);
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      margin-bottom: 14px;
+    }
+
+    .chart-header {
+      padding: 11px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .chart-pair {
+      font-weight: 700;
+      font-size: 14px;
+    }
+    .chart-pair span {
+      color: var(--gold);
+      font-size: 11px;
+      font-weight: 500;
+      margin-left: 5px;
+    }
+
+    /* Indicator badges */
+    .indicators {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+
+    .ind-badge {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 11px;
+      color: var(--text2);
+    }
+    .ind-badge strong {
+      color: var(--gold);
+      font-weight: 600;
+    }
+
+    /* Style cards */
+    .style-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .style-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 8px;
+      text-align: center;
+    }
+
+    .style-card h4 {
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      color: var(--gold);
+    }
+
+    .style-card p {
+      font-size: 10.5px;
+      color: var(--text2);
+      line-height: 1.4;
+    }
+
+    /* Signal Cards */
+    .signals-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .signal-card {
+      background: var(--card);
+      border-radius: 13px;
+      padding: 14px;
+      border: 1px solid var(--border);
+    }
+
+    .signal-card.buy { border-left: 4px solid var(--green); }
+    .signal-card.sell { border-left: 4px solid var(--red); }
+
+    .signal-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .signal-type {
+      font-size: 12px;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 5px;
+    }
+    .signal-type.buy {
+      background: rgba(0,200,83,0.15);
+      color: var(--green);
+    }
+    .signal-type.sell {
+      background: rgba(255,23,68,0.15);
+      color: var(--red);
+    }
+
+    .signal-style {
+      font-size: 11px;
+      color: var(--text2);
+      background: var(--card2);
+      padding: 3px 8px;
+      border-radius: 5px;
+    }
+
+    .signal-strategy {
+      font-size: 12px;
+      color: var(--gold);
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .signal-reason {
+      font-size: 12.5px;
+      color: var(--text2);
+      line-height: 1.45;
+    }
+
+    .signal-levels {
+      display: flex;
+      gap: 8px;
+      margin-top: 11px;
+      flex-wrap: wrap;
+    }
+
+    .level {
+      background: var(--card2);
+      padding: 5px 9px;
+      border-radius: 7px;
+      font-size: 11.5px;
+    }
+    .level span {
+      color: var(--text2);
+      margin-right: 3px;
+    }
+
+    /* Sessions */
+    .sessions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .session {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      padding: 11px;
+    }
+
+    .session h4 {
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 3px;
+    }
+
+    .session p {
+      font-size: 11px;
+      color: var(--text2);
+    }
+
+    .session.active-session {
+      border-color: var(--gold);
+      background: rgba(212,160,23,0.06);
+    }
+
+    /* Macro filter (small) */
+    .macro-box {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 13px;
+      border: 1px solid var(--border);
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .macro-left h4 {
+      font-size: 12px;
+      color: var(--text2);
+      font-weight: 500;
+      margin-bottom: 2px;
+    }
+
+    .macro-left .val {
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .macro-right {
+      text-align: right;
+    }
+
+    .macro-right .corr {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--gold);
+    }
+
+    .macro-right .label {
+      font-size: 10.5px;
+      color: var(--text2);
+    }
+
+    /* News */
+    .news-card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 14px;
+      border: 1px solid var(--border);
+      margin-bottom: 10px;
+    }
+
+    .news-tag {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 4px;
+      display: inline-block;
+      margin-bottom: 7px;
+      background: rgba(255,23,68,0.18);
+      color: var(--red);
+    }
+
+    .news-title {
+      font-size: 13.5px;
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+
+    .news-desc {
+      font-size: 12.5px;
+      color: var(--text2);
+      margin-bottom: 9px;
+    }
+
+    .news-action {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 10px;
+      border-radius: 7px;
+      display: inline-block;
+    }
+    .action-sell {
+      background: rgba(255,23,68,0.14);
+      color: var(--red);
+    }
+    .action-buy {
+      background: rgba(0,200,83,0.14);
+      color: var(--green);
+    }
+
+    /* Telegram */
+    .tg-box {
+      background: var(--card);
+      border-radius: 14px;
+      padding: 18px;
+      border: 1px solid var(--border);
+    }
+
+    .tg-box h3 {
+      font-size: 15px;
+      margin-bottom: 6px;
+    }
+
+    .tg-box > p {
+      font-size: 12.5px;
+      color: var(--text2);
+      margin-bottom: 14px;
+    }
+
+    .form-group {
+      margin-bottom: 12px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 11.5px;
+      color: var(--text2);
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 11px 13px;
+      background: var(--card2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-size: 13.5px;
+      outline: none;
+    }
+
+    .form-group input:focus {
+      border-color: var(--gold);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 13px;
+      border: none;
+      border-radius: 11px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .btn-gold {
+      background: linear-gradient(135deg, var(--gold), #b8860b);
+      color: #000;
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+      margin-top: 8px;
+    }
+
+    .tip {
+      background: rgba(212,160,23,0.07);
+      border: 1px solid rgba(212,160,23,0.18);
+      border-radius: 11px;
+      padding: 12px;
+      margin-top: 14px;
+      font-size: 12px;
+      color: var(--text2);
+    }
+    .tip strong { color: var(--gold); }
+
+    /* Bottom Nav */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #0f0f0f;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-around;
+      padding: 8px 0 12px;
+      z-index: 100;
+    }
+
+    .bottom-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      font-size: 10.5px;
+      color: var(--text2);
+      background: none;
+      border: none;
+      font-family: inherit;
+      cursor: pointer;
+    }
+
+    .bottom-item.active { color: var(--gold); }
+    .bottom-icon { font-size: 18px; }
+
+    @media (min-width: 600px) {
+      .signals-list {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="logo">
+      <div class="logo-icon">T4</div>
+      <div class="logo-text">T4FX <span>GOLD</span></div>
+    </div>
+    <div class="status">
+      <div class="status-dot"></div>
+      XAUUSD Live
+    </div>
+  </header>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab active" data-section="chart">Chart</button>
+    <button class="tab" data-section="signals">Signals</button>
+    <button class="tab" data-section="setups">Setups</button>
+    <button class="tab" data-section="news">News</button>
+    <button class="tab" data-section="telegram">Alerts</button>
+  </div>
+
+  <!-- ========== CHART ========== -->
+  <section id="chart" class="section active">
+    <div class="chart-box">
+      <div class="chart-header">
+        <div class="chart-pair">XAUUSD <span>Gold</span></div>
+        <div style="font-size:11px;color:var(--text2)">TradingView</div>
+      </div>
+      <div id="tradingview_chart" style="height:440px"></div>
+    </div>
+
+    <!-- Pre-loaded indicators explanation -->
+    <div class="section-title">Active Indicators</div>
+    <div class="indicators">
+      <div class="ind-badge"><strong>EMA 9</strong> Scalp</div>
+      <div class="ind-badge"><strong>EMA 21</strong> Day</div>
+      <div class="ind-badge"><strong>EMA 50</strong> Swing</div>
+      <div class="ind-badge"><strong>EMA 200</strong> Trend</div>
+      <div class="ind-badge"><strong>RSI 14</strong></div>
+      <div class="ind-badge"><strong>VWAP</strong></div>
+      <div class="ind-badge"><strong>Volume</strong></div>
+    </div>
+
+    <div class="tip">
+      <strong>How to use the indicators:</strong><br>
+      • <strong>Scalping</strong> → Watch EMA 9 + EMA 21 cross + VWAP + RSI<br>
+      • <strong>Day Trading</strong> → EMA 21 + EMA 50 + VWAP reaction<br>
+      • <strong>Swing</strong> → EMA 50 + EMA 200 direction + higher timeframe structure
+    </div>
+  </section>
+
+  <!-- ========== SIGNALS ========== -->
+  <section id="signals" class="section">
+    <div class="section-title">Live Signals (Order Block + FVG Only)</div>
+
+    <div class="tip" style="margin-top:0;margin-bottom:14px">
+      <strong>Rule:</strong> Signals appear only when a clear Order Block + Fair Value Gap confluence is active. No forced signals. Quality over quantity.
+    </div>
+
+    <div class="signals-list">
+      <!-- Valid Buy Signal -->
+      <div class="signal-card buy">
+        <div class="signal-top">
+          <span class="signal-type buy">BUY</span>
+          <span class="signal-style">Active</span>
+        </div>
+        <div class="signal-strategy">Bullish Order Block + FVG</div>
+        <div class="signal-reason">
+          Price returned into a fresh bullish Order Block on M5 and is filling a clean Fair Value Gap. Demand is still unfilled. Valid as long as the Order Block low holds.
+        </div>
+        <div class="signal-levels">
+          <div class="level"><span>Entry</span> 3617.80 – 3619.50</div>
+          <div class="level"><span>SL</span> Below OB 3612.40</div>
+          <div class="level"><span>TP1</span> 3628.00</div>
+        </div>
+      </div>
+
+      <!-- Valid Sell Signal -->
+      <div class="signal-card sell">
+        <div class="signal-top">
+          <span class="signal-type sell">SELL</span>
+          <span class="signal-style">Active</span>
+        </div>
+        <div class="signal-strategy">Bearish Order Block + FVG</div>
+        <div class="signal-reason">
+          Price is reacting from a bearish Order Block on M15 after filling an imbalance (FVG). Supply zone still respected. Valid while price stays below the Order Block high.
+        </div>
+        <div class="signal-levels">
+          <div class="level"><span>Entry</span> 3626.50 – 3628.20</div>
+          <div class="level"><span>SL</span> Above OB 3633.80</div>
+          <div class="level"><span>TP1</span> 3614.00</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Trade Stories -->
+    <div class="section-title" style="margin-top:22px">Trade Stories (Learn from Win & Loss)</div>
+
+    <div class="signals-list">
+      <!-- Win Story -->
+      <div class="signal-card buy">
+        <div class="signal-top">
+          <span class="signal-type buy">WIN</span>
+          <span class="signal-style">+86 points</span>
+        </div>
+        <div class="signal-strategy">Bullish Order Block + FVG (M5)</div>
+        <div class="signal-reason">
+          Price tapped a clear bullish Order Block and filled the FVG. Entered with tight stop below the block. Target hit cleanly at next liquidity. 
+          <br><br><strong>Lesson:</strong> When Order Block is fresh and FVG is clean, probability is high. Patience paid off.
+        </div>
+      </div>
+
+      <!-- Loss Story -->
+      <div class="signal-card sell">
+        <div class="signal-top">
+          <span class="signal-type sell">LOSS</span>
+          <span class="signal-style">-28 points</span>
+        </div>
+        <div class="signal-strategy">Bearish Order Block (but weak)</div>
+        <div class="signal-reason">
+          Entered a Sell from Order Block, but the FVG was already partially filled and higher timeframe was bullish. Stop was hit.
+          <br><br><strong>Lesson:</strong> Never take Order Block alone. Always need clean unused FVG + higher timeframe alignment. This loss taught better filtering.
+        </div>
+      </div>
+
+      <!-- Another Win -->
+      <div class="signal-card buy">
+        <div class="signal-top">
+          <span class="signal-type buy">WIN</span>
+          <span class="signal-style">+52 points</span>
+        </div>
+        <div class="signal-strategy">Order Block + FVG Confluence</div>
+        <div class="signal-reason">
+          London session. Price came back to unfilled bullish Order Block exactly at FVG. Strong reaction. Scaled out at partial and final target.
+          <br><br><strong>Lesson:</strong> Best signals happen during London & New York open when volume is real.
+        </div>
+      </div>
+    </div>
+
+    <div class="tip">
+      <strong>Important:</strong> Signals are only shown when Order Block + FVG are both valid and unfilled. If no clean setup exists, no signal will appear. This protects you from overtrading.
+    </div>
+  </section>
+
+  <!-- ========== SETUPS (Styles + Sessions) ========== -->
+  <section id="setups" class="section">
+    <div class="section-title">Trading Styles Guide</div>
+
+    <div class="style-grid">
+      <div class="style-card">
+        <h4>Scalping</h4>
+        <p>M1 – M5<br>EMA 9/21<br>VWAP + RSI<br>Quick 10–30 pts</p>
+      </div>
+      <div class="style-card">
+        <h4>Day Trade</h4>
+        <p>M15 – H1<br>EMA 21/50<br>VWAP + Structure<br>50–150 pts</p>
+      </div>
+      <div class="style-card">
+        <h4>Swing</h4>
+        <p>H4 – Daily<br>EMA 50/200<br>HTF Order Blocks<br>200+ pts</p>
+      </div>
+    </div>
+
+    <div class="section-title">Best Gold Sessions</div>
+    <div class="sessions">
+      <div class="session">
+        <h4>London Open</h4>
+        <p>07:00 – 10:00 GMT<br>Strong moves</p>
+      </div>
+      <div class="session">
+        <h4>New York Open</h4>
+        <p>12:30 – 16:00 GMT<br>Highest volume</p>
+      </div>
+      <div class="session">
+        <h4>London Close</h4>
+        <p>15:00 – 17:00 GMT<br>Reversals often</p>
+      </div>
+      <div class="session">
+        <h4>Asia</h4>
+        <p>00:00 – 06:00 GMT<br>Range / low vol</p>
+      </div>
+    </div>
+
+    <!-- Small DXY filter -->
+    <div class="section-title">Macro Filter (Optional)</div>
+    <div class="macro-box">
+      <div class="macro-left">
+        <h4>DXY (Dollar Index)</h4>
+        <div class="val">104.27</div>
+      </div>
+      <div class="macro-right">
+        <div class="corr">−0.37</div>
+        <div class="label">90d correlation</div>
+      </div>
+    </div>
+    <div class="tip" style="margin-top:0">
+      <strong>Simple rule:</strong> Strong DXY → prefer Sell Gold. Weak DXY → prefer Buy Gold. Use only as extra confirmation with your ICT/SMC setup.
+    </div>
+  </section>
+
+  <!-- ========== NEWS ========== -->
+  <section id="news" class="section">
+    <div class="section-title">USA News → Gold Reaction</div>
+
+    <div class="news-card">
+      <span class="news-tag">HIGH IMPACT</span>
+      <div class="news-title">CPI / NFP / FOMC / Retail Sales</div>
+      <div class="news-desc">
+        Strong US data usually = stronger Dollar = pressure on Gold.<br>
+        Weak US data usually = weaker Dollar = support for Gold.
+      </div>
+      <div class="news-action action-sell">Strong USD → Prefer SELL Gold</div>
+    </div>
+
+    <div class="news-card">
+      <span class="news-tag">1-MINUTE RULE</span>
+      <div class="news-title">First reaction strategy</div>
+      <div class="news-desc">
+        When big news hits, watch the first 1–3 minutes.<br>
+        Clear USD strength → look for Sell setups.<br>
+        Clear USD weakness → look for Buy setups.<br>
+        Always confirm with structure and Order Flow.
+      </div>
+    </div>
+
+    <div class="tip">
+      <strong>Best practice:</strong> Keep Forex Factory or Investing.com calendar open. When red-folder news is about to release, switch to M1/M5 and wait for the reaction.
+    </div>
+  </section>
+
+  <!-- ========== TELEGRAM ========== -->
+  <section id="telegram" class="section">
+    <div class="section-title">Telegram Alerts</div>
+
+    <div class="tg-box">
+      <h3>Get signals on your phone</h3>
+      <p>Receive Buy/Sell alerts and important Gold news directly in Telegram.</p>
+
+      <div class="form-group">
+        <label>Bot Token (from @BotFather)</label>
+        <input type="text" id="botToken" placeholder="123456789:ABCdefGHIjkl...">
+      </div>
+
+      <div class="form-group">
+        <label>Your Chat ID</label>
+        <input type="text" id="chatId" placeholder="Your numeric Telegram ID">
+      </div>
+
+      <button class="btn btn-gold" onclick="saveTelegram()">Save Settings</button>
+      <button class="btn btn-outline" onclick="testTelegram()">Send Test Alert</button>
+
+      <div class="tip">
+        <strong>How to connect:</strong><br>
+        1. Open Telegram → search <strong>@BotFather</strong><br>
+        2. Send /newbot → follow steps → copy Token<br>
+        3. Search <strong>@userinfobot</strong> → Start → copy your ID<br>
+        4. Paste both above and tap Save
+      </div>
+    </div>
+  </section>
+
+  <!-- Bottom Navigation -->
+  <nav class="bottom-nav">
+    <button class="bottom-item active" data-section="chart">
+      <span class="bottom-icon">📈</span>
+      Chart
+    </button>
+    <button class="bottom-item" data-section="signals">
+      <span class="bottom-icon">⚡</span>
+      Signals
+    </button>
+    <button class="bottom-item" data-section="setups">
+      <span class="bottom-icon">🎯</span>
+      Setups
+    </button>
+    <button class="bottom-item" data-section="news">
+      <span class="bottom-icon">📰</span>
+      News
+    </button>
+    <button class="bottom-item" data-section="telegram">
+      <span class="bottom-icon">🔔</span>
+      Alerts
+    </button>
+  </nav>
+
+  <!-- TradingView -->
+  <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+  <script>
+    new TradingView.widget({
+      container_id: "tradingview_chart",
+      width: "100%",
+      height: "100%",
+      symbol: "OANDA:XAUUSD",
+      interval: "5",
+      timezone: "Etc/UTC",
+      theme: "dark",
+      style: "1",
+      locale: "en",
+      toolbar_bg: "#0a0a0a",
+      enable_publishing: false,
+      hide_top_toolbar: false,
+      hide_legend: false,
+      save_image: false,
+      backgroundColor: "#0a0a0a",
+      gridColor: "rgba(42,42,42,0.45)",
+      allow_symbol_change: true,
+      details: true,
+      studies: [
+        "STD;EMA",           // Will allow user to add more
+        "STD;RSI",
+        "Volume@tv-basicstudies"
+      ],
+      overrides: {
+        "mainSeriesProperties.candleStyle.upColor": "#00c853",
+        "mainSeriesProperties.candleStyle.downColor": "#ff1744",
+        "mainSeriesProperties.candleStyle.borderUpColor": "#00c853",
+        "mainSeriesProperties.candleStyle.borderDownColor": "#ff1744",
+        "mainSeriesProperties.candleStyle.wickUpColor": "#00c853",
+        "mainSeriesProperties.candleStyle.wickDownColor": "#ff1744"
+      }
+    });
+
+    // Navigation
+    const sections = document.querySelectorAll('.section');
+    const tabs = document.querySelectorAll('.tab');
+    const bottomItems = document.querySelectorAll('.bottom-item');
+
+    function showSection(id) {
+      sections.forEach(s => s.classList.remove('active'));
+      tabs.forEach(t => t.classList.remove('active'));
+      bottomItems.forEach(b => b.classList.remove('active'));
+
+      document.getElementById(id).classList.add('active');
+      document.querySelectorAll(`[data-section="${id}"]`).forEach(el => el.classList.add('active'));
+    }
+
+    tabs.forEach(btn => btn.addEventListener('click', () => showSection(btn.dataset.section)));
+    bottomItems.forEach(item => item.addEventListener('click', () => showSection(item.dataset.section)));
+
+    // Telegram
+    function saveTelegram() {
+      const token = document.getElementById('botToken').value.trim();
+      const chatId = document.getElementById('chatId').value.trim();
+      if (!token || !chatId) {
+        alert('Please enter both Bot Token and Chat ID');
+        return;
+      }
+      localStorage.setItem('t4fx_bot_token', token);
+      localStorage.setItem('t4fx_chat_id', chatId);
+      alert('Saved! Alerts will work on this phone.');
+    }
+
+    function testTelegram() {
+      const token = localStorage.getItem('t4fx_bot_token') || document.getElementById('botToken').value.trim();
+      const chatId = localStorage.getItem('t4fx_chat_id') || document.getElementById('chatId').value.trim();
+      if (!token || !chatId) {
+        alert('Please save Token and Chat ID first');
+        return;
+      }
+      const msg = encodeURIComponent('T4FX GOLD Test Alert\n\nConnection successful.\nYou will receive Gold Buy/Sell signals and news alerts here.');
+      fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatId}&text=${msg}`)
+        .then(r => r.json())
+        .then(d => {
+          if (d.ok) alert('Test sent! Check your Telegram.');
+          else alert('Error: ' + (d.description || 'Failed'));
+        })
+        .catch(() => alert('Network error. Check token and internet.'));
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const t = localStorage.getItem('t4fx_bot_token');
+      const c = localStorage.getItem('t4fx_chat_id');
+      if (t) document.getElementById('botToken').value = t;
+      if (c) document.getElementById('chatId').value = c;
+    });
+  </script>
+</body>
+</html>
